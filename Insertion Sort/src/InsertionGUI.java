@@ -8,9 +8,13 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 import BreezySwing.*;
+
+import java.awt.Color;
+import java.awt.color.*;
 public class InsertionGUI extends GBFrame implements KeyListener,ItemListener{
 
 	public String original = ("1");
+	private int count = 0;
 	JLabel inLbl = addLabel ("Enter a Number:",1,1,2,1);
 	IntegerField inputFld = addIntegerField(0,2,1,2,1);
 	ButtonGroup listOp = new ButtonGroup();
@@ -26,6 +30,7 @@ public class InsertionGUI extends GBFrame implements KeyListener,ItemListener{
 	Sort s = new Sort();
 	
 	public InsertionGUI() {
+
 		og.setSelected(true);
 		inputFld.selectAll();
 		listOp.add(og);
@@ -49,8 +54,13 @@ public class InsertionGUI extends GBFrame implements KeyListener,ItemListener{
 	}
 
 	@Override
-	public void keyPressed(KeyEvent e) {
+	public void keyPressed(KeyEvent e){
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			count ++;
+			if (count>25) {
+				messageBox("You can not enter more than 25 numbers");
+				return;
+			}
 			inputFld.requestFocus();
 			inputFld.selectAll();
 			unsorted.add(inputFld.getNumber());
@@ -63,15 +73,24 @@ public class InsertionGUI extends GBFrame implements KeyListener,ItemListener{
 	public void menuItemSelected(JMenuItem mi) {
 		if (mi == modeMI) {
 			String str = "";
-			for (int i = 0; i < s.mode().size(); i ++) {
-				str+=((int)s.mode().get(i)+", ");
+			try {
+				s.mode();
+			
+			for (int i = 0; i < s.getModeList().size(); i ++) {
+				str+=((int)s.getModeList().get(i)+", ");
 			}
 			messageBox("The mode is: "+ str);
 			str = "";
+			} catch (InvalidModeException e) {
+				// TODO Auto-generated catch block
+				messageBox(e.getMessage());
+			}
 		}else if (mi == meanMI) {
 			messageBox("The Mean is: "+ s.mean());
 		}else if (mi == medianMI) {
 			messageBox("The Median is: "+ s.median());
+		}else if (mi == stdMI) {
+			messageBox("The Standard Deviation is: "+ s.SD());
 		}
 	}
 	

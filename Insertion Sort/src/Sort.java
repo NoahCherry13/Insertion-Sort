@@ -2,6 +2,7 @@ import java.util.ArrayList;
 
 public class Sort<T extends Comparable<T>> {
 	private ArrayList<T> list = new ArrayList<>();
+	ArrayList<Integer> modeList;
 
 	public Sort(ArrayList<T> a) {
 		list = a;
@@ -37,12 +38,12 @@ public class Sort<T extends Comparable<T>> {
 		return list;
 	}
 	
-	public int mean() {
+	public double mean() {
 		int sum = 0;
 		for (Object o: list) {
 			sum+=(int)o;
 		}
-		return sum/list.size();
+		return (double)sum/(double)list.size();
 	}
 	
 	public double median() {
@@ -62,14 +63,18 @@ public class Sort<T extends Comparable<T>> {
 		return false;
 	}
 	
-	public ArrayList<Integer> mode(){
+	public ArrayList<Integer> getModeList(){
+		return modeList;
+	}
+	
+	public void mode()throws InvalidModeException{
 		int count = 2;
-		int oc = 1;
-		ArrayList<Integer> modeList = new ArrayList<Integer>();
+		int oc = 0;
+		modeList = new ArrayList<Integer>();
 		modeList.clear();
 		for(int i = 0; i < list.size();i++) {
 			for (int j = 0; j< list.size(); j++) {
-				if ((int)list.get(i) == (int)list.get(j) && i!=j&& !inList((int)list.get(i),modeList)) {
+				if ((int)list.get(i) == (int)list.get(j) && !inList((int)list.get(i),modeList)) {
 					oc++;
 				}
 			}
@@ -77,13 +82,26 @@ public class Sort<T extends Comparable<T>> {
 				modeList.clear();
 				modeList.add((Integer) list.get(i));
 				count = oc;
-				oc = 1;
+				oc = 0;
 			}else if (oc == count) {
-				oc = 1;
+				oc = 0;
 				modeList.add((Integer)list.get(i));
 			}
-			System.out.println('\n');
+			oc = 0;
 		}
-		return modeList;
+		if (modeList.size() == 0) {
+			throw new InvalidModeException("There is no Mode");
+		}
+	}
+	
+	public double SD () {
+		double average = mean();
+		double total = 0;
+		for (Object o: list) {
+			total += Math.pow((int)o - average,2);
+		}
+		double av2 = total /list.size();
+		return Math.sqrt(av2);
+		
 	}
 }
