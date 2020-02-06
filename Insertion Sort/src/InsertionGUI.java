@@ -1,27 +1,38 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
 import javax.swing.*;
 import BreezySwing.*;
-public class InsertionGUI extends GBFrame implements KeyListener{
+public class InsertionGUI extends GBFrame implements KeyListener,ItemListener{
 
-	String original = ("");
+	public String original = ("1");
 	JLabel inLbl = addLabel ("Enter a Number:",1,1,2,1);
 	IntegerField inputFld = addIntegerField(0,2,1,2,1);
 	ButtonGroup listOp = new ButtonGroup();
 	JRadioButton og = addRadioButton("Show Original",3,1,1,1);
 	JRadioButton sorted = addRadioButton("Show Sorted",3,2,1,1);
 	JTextArea ListArea = addTextArea("",4,1,2,1);
-	
+	ArrayList <Integer> unsorted = new ArrayList<Integer>();
+	JMenuItem meanMI = addMenuItem("Compute","Mean");
+	JMenuItem medianMI = addMenuItem("Compute","Median");
+	JMenuItem modeMI = addMenuItem("Compute","Mode");
+	JMenuItem stdMI = addMenuItem("Compute","Standard Deviation");
 	
 	Sort s = new Sort();
 	
 	public InsertionGUI() {
+		og.setSelected(true);
+		inputFld.selectAll();
 		listOp.add(og);
 		listOp.add(sorted);
 		inputFld.addKeyListener(this);
+		og.addItemListener(this);
+		sorted.addItemListener(this);
 	}
 	
 	public static void main(String[] args) {
@@ -40,12 +51,28 @@ public class InsertionGUI extends GBFrame implements KeyListener{
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-			original.concat(inputFld.getNumber()+", ");
+			inputFld.requestFocus();
+			inputFld.selectAll();
+			unsorted.add(inputFld.getNumber());
 			s.addObj(inputFld.getNumber());
-			System.out.println(original);
 			populate();
 		}
 		
+	}
+	
+	public void menuItemSelected(JMenuItem mi) {
+		if (mi == modeMI) {
+			String str = "";
+			for (int i = 0; i < s.mode().size(); i ++) {
+				str+=((int)s.mode().get(i)+", ");
+			}
+			messageBox("The mode is: "+ str);
+			str = "";
+		}else if (mi == meanMI) {
+			messageBox("The Mean is: "+ s.mean());
+		}else if (mi == medianMI) {
+			messageBox("The Median is: "+ s.median());
+		}
 	}
 	
 	@Override
@@ -60,13 +87,29 @@ public class InsertionGUI extends GBFrame implements KeyListener{
 	
 	public void populate() {
 		if (og.isSelected()) {
-			ListArea.setText(original);
+			ListArea.setText("");
+			for (Integer i: unsorted) {
+				ListArea.append((int)i+", ");
+			}
 		}else if (sorted.isSelected()) {
 			ListArea.setText("");
 			for (Object t: s.getSorted()) {
 				ListArea.append((int)t+", ");
 			}
 		}
+	}
+
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		if (e.getStateChange() == ItemEvent.SELECTED) {
+
+			if (og.isSelected()) {
+				populate();
+			} else if (sorted.isSelected()) {
+				populate();
+			}
+		}
+
 	}
 
 }
